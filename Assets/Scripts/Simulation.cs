@@ -16,13 +16,10 @@ public class Simulation : MonoBehaviour
         {
             // generate the agents dynamically
             GameObject agent = new GameObject("Agent " + i);
-            agent.tag = "Agent";
-            agent.AddComponent<Agent>();
+            agent.tag = "Agent"; // add the proper tag, so other scripts can reference them. 
+            agent.AddComponent<Agent>(); // add the Agent script to each agent
 
         }
-
-
-        // Randomly assign agent parameters
 
     }
 

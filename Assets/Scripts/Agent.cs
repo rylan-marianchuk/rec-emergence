@@ -37,7 +37,7 @@ public class Agent : MonoBehaviour
         // @TODO: change for later!
         Scores = new List<int>();
 
-        for (int i = 0; i < r.sysp.NumberDocuments; i++)
+        for (int i = 0; i < r.sysp.NumberCategories; i++)
         {
             Scores.Add(Random.Range(0, 10));
         }

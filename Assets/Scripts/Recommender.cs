@@ -16,7 +16,7 @@ public class Parameters
     /// <summary>
     /// Controls the number of documents in the system
     /// </summary>
-    public int NumberDocuments { get; set; }
+    public int NumberCategories { get; set; }
     /// <summary>
     /// Controls how many like users the algorithm identifies to make a recommendation
     /// </summary>
@@ -32,20 +32,22 @@ public class Parameters
     /// </summary>
     /// <param name="agents">the number of agents in the system</param>
     /// <param name="docs">the number of documents in the system</param>
-    public Parameters(int agents, int docs)
+    public Parameters(int agents, int cats)
     {
         NumberAgents = agents;
-        NumberDocuments = docs;
+        NumberCategories = docs;
         metric = Metric.Cosine;
     }
 
 }
 
-
+/// <summary>
+/// Emum for selecting which metric is to be used for calculating the simularity matrix used by the system
+/// </summary>
 public enum Metric
 {
     Cosine,
-    CorrectedCosine,
+    //CorrectedCosine,
     Pearson,
     Euclidean
 }
@@ -53,13 +55,20 @@ public enum Metric
 
 public class Recommender : MonoBehaviour
 {
-
+    /// <summary>
+    /// The parameters wrapper for the recommender system 
+    /// </summary>
     public Parameters sysp { get; set; }
 
-    List<Agent> Agents = new List<Agent>();
 
+    public Matrix<double> similarity { get; set; }
+
+    /// <summary>
+    /// Instantiation of objects that other scripts/objects rely on
+    /// </summary>
     void Awake()
     {
+        // Must initialize the parameters before the agents are initialized! 
         sysp = new Parameters(10, 10);
         Debug.Log("System parameters set");
     }
@@ -67,14 +76,11 @@ public class Recommender : MonoBehaviour
     private void Start()
     {
 
-
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        Matrix<Double> similarity = null;
         bool init = false;
         if (!init)
         {
@@ -92,28 +98,27 @@ public class Recommender : MonoBehaviour
     {
         //Calculate the matrix!
 
-        // get all the agents
-
+        // Gather all of the agents in the scene
         GameObject[] agents = GameObject.FindGameObjectsWithTag("Agent");
 
-        // List of all of the agents scores
-        List<List<int>> m = new List<List<int>>();
+        // Initialize a matrix according to system parameters
+        double[,] matrix = new double[sysp.NumberAgents, sysp.NumberCategories];
 
-        double[,] matrix = new double[sysp.NumberAgents, sysp.NumberDocuments];
-
-
+        // Group the scores from each agent into primitive matrix
         for (int i = 0; i < agents.Length; i++)
         {
             int[] temp = agents[i].GetComponent<Agent>().Scores.ToArray();
-            for (int j = 0; j < sysp.NumberDocuments; j++)
+            for (int j = 0; j < sysp.NumberCategories; j++)
             {
                 matrix[i, j] = (double)temp[j];
             }
         }
 
+        // Some initialization for Math.NET / matrix algebra
         var MatBuilder = Matrix<double>.Build;
         var VecBuilder = Vector<double>.Build;
 
+        // Convert the primitive matrix of all of the agents preferences
         Matrix<double> M = DenseMatrix.OfArray(matrix);
         // creates a similarity matrix
         Matrix<double> simMat = MatBuilder.Dense(sysp.NumberAgents, sysp.NumberAgents);
