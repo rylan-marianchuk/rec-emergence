@@ -5,9 +5,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Statistics;
 using MathNet.Numerics;
 using UnityEngine;
-
-
-
+using System;
 
 public class Parameters
 {
@@ -60,18 +58,14 @@ public class Recommender : MonoBehaviour
 
     List<Agent> Agents = new List<Agent>();
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-
         sysp = new Parameters(10, 10);
+        Debug.Log("System parameters set");
+    }
 
-        // get a list of the agents somehow
-
-        for (int i = 0; i < sysp.NumberAgents; i++)
-        {
-            Agents.Add(new Agent());
-        }
+    private void Start()
+    {
 
 
     }
@@ -80,8 +74,148 @@ public class Recommender : MonoBehaviour
     void Update()
     {
 
-        // Recalculate the matrix
+        Matrix<Double> similarity = null;
+        bool init = false;
+        if (!init)
+        {
+            similarity = calculateSimilarityMatrix();
+            init = true;
+            Debug.Log("Similarity matrix: " + similarity.ToString());
+        }
 
+        // Recalculate the matrix
+        
         
     }
+
+    public Matrix<double> calculateSimilarityMatrix()
+    {
+        //Calculate the matrix!
+
+        // get all the agents
+
+        GameObject[] agents = GameObject.FindGameObjectsWithTag("Agent");
+
+        // List of all of the agents scores
+        List<List<int>> m = new List<List<int>>();
+
+        double[,] matrix = new double[sysp.NumberAgents, sysp.NumberDocuments];
+
+
+        for (int i = 0; i < agents.Length; i++)
+        {
+            int[] temp = agents[i].GetComponent<Agent>().Scores.ToArray();
+            for (int j = 0; j < sysp.NumberDocuments; j++)
+            {
+                matrix[i, j] = (double)temp[j];
+            }
+        }
+
+        var MatBuilder = Matrix<double>.Build;
+        var VecBuilder = Vector<double>.Build;
+
+        Matrix<double> M = DenseMatrix.OfArray(matrix);
+        // creates a similarity matrix
+        Matrix<double> simMat = MatBuilder.Dense(sysp.NumberAgents, sysp.NumberAgents);
+
+        for (int i = 0; i < sysp.NumberAgents; i++)
+        {
+            for (int j = 0; j < sysp.NumberAgents; j++)
+            {
+
+                if (sysp.metric == Metric.Cosine)
+                {
+                    // calculate the cosine similarity of the agents!
+                    simMat[i, j] = CosineSimilarity(M.Row(i), M.Row(j));
+                } else if (sysp.metric == Metric.Pearson)
+                {
+                    // calculate the pearson similarity of the agents!
+                    simMat[i, j] = PearsonSimilarity(M.Row(i), M.Row(j));
+                } else if (sysp.metric == Metric.Euclidean)
+                {
+                    // calculate the euclidean similarity of the agents!
+                    simMat[i, j] = EuclideanSimilarity(M.Row(i), M.Row(j));
+                }
+
+            }
+        }
+
+        return simMat;
+    }
+
+
+
+    /// <summary>
+    /// Calculates the cosine simularity of two vectors
+    /// </summary>
+    /// <param name="a">The first vector</param>
+    /// <param name="b">The second vector</param>
+    /// <returns></returns>
+    public static double CosineSimilarity(Vector<double> a, Vector<double> b)
+    {
+        double dot = a.DotProduct(b);
+        double denom = a.L2Norm() * b.L2Norm();
+
+        return dot / denom;
+    }
+
+    /// <summary>
+    /// Pearson similarity calculates the similarity of two vectors. It returns a similarity value that ranges from -1.00 which is the most dissimilar, to 1.00 which is completely identical. 
+    /// </summary>
+    /// <param name="a">The first vector</param>
+    /// <param name="b">The second vector</param>
+    /// <returns></returns>
+    public static double PearsonSimilarity(Vector<double> a, Vector<double> b)
+    {
+        double covariance = Statistics.Covariance(a, b);
+        double denom = Statistics.StandardDeviation(a) * Statistics.StandardDeviation(b);
+
+        return covariance / denom;
+    }
+
+    public static double EuclideanSimilarity(Vector<double> a, Vector<double> b)
+    {
+        double dist = Distance.Euclidean<double>(a, b);
+        return 1 / (1 + dist);
+    }
+
+    /// <summary>
+    /// Finds the other agents with the most similar score
+    /// </summary>
+    /// <param name="similarity">The simularity matrix to search</param>
+    /// <param name="neighbours">The number of desired similar neighbours</param>
+    /// <param name="agentNum"> The agent number to find similar agents to</param>
+    /// <returns></returns>
+    public static List<int> FindNearestNeighbours(Matrix<double> similarity, int neighbours, int agentNum)
+    {
+
+        // take the matrix row, and find the k closest values
+        Vector<double> ratings = similarity.Row(agentNum);
+
+
+        List<Tuple<int, double>> res = new List<Tuple<int, double>>();
+
+        for (int i = 0; i < ratings.Count; i++)
+        {
+            if (i != agentNum)
+            {
+                Tuple<int, double> t = new Tuple<int, double>(i, ratings[i]);
+                res.Add(t);
+            }
+        }
+
+        // sort list according to double, extract first
+        res.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+
+        List<int> closestAgents = new List<int>();
+        // add the agentNum closest matches to results
+        for (int i = 0; i < neighbours; i++)
+        {
+            // add the result to 
+            closestAgents.Add(res[i].Item1);
+        }
+
+        return closestAgents;
+    }
+
 }

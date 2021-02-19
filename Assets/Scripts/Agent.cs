@@ -13,6 +13,8 @@ public class Agent : MonoBehaviour
     /// </summary>
     Recommender r;
 
+    GameObject rObj;
+
     /// <summary>
     /// Should have some level of interest in categories. I was thinking these should all start around 5 on a scale of 1-10? 
     /// This way, the agents will have at least some bearing without starting them off with an already extreme profile.
@@ -22,17 +24,20 @@ public class Agent : MonoBehaviour
     void Start()
     {
         // Creates the system parameters
-        r = GetComponent<Recommender>();
+
+        // GameObject containing the recommender
+        rObj = GameObject.FindGameObjectWithTag("Recommender");
+
+        // get the script attached to the recommender object!
+        r = rObj.GetComponent<Recommender>();
 
         // Generate random set of interests
-
-
         // populate the agent's ratings
         // generates random values from 0-10 for now
         // @TODO: change for later!
         Scores = new List<int>();
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < r.sysp.NumberDocuments; i++)
         {
             Scores.Add(Random.Range(0, 10));
         }

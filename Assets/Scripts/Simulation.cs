@@ -9,6 +9,19 @@ public class Simulation : MonoBehaviour
     void Start()
     {
         // Initialize agents & documents
+
+        Parameters p = GameObject.FindGameObjectWithTag("Recommender").GetComponent<Recommender>().sysp;
+
+        for (int i =0; i< p.NumberAgents;i++)
+        {
+            // generate the agents dynamically
+            GameObject agent = new GameObject("Agent " + i);
+            agent.tag = "Agent";
+            agent.AddComponent<Agent>();
+
+        }
+
+
         // Randomly assign agent parameters
 
     }
