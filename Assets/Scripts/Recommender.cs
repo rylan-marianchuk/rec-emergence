@@ -35,7 +35,7 @@ public class Parameters
     public Parameters(int agents, int cats)
     {
         NumberAgents = agents;
-        NumberCategories = docs;
+        NumberCategories = cats;
         metric = Metric.Cosine;
     }
 
