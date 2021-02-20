@@ -7,40 +7,6 @@ using MathNet.Numerics;
 using UnityEngine;
 using System;
 
-public class Parameters
-{
-    /// <summary>
-    /// Controls the number of agents in the system
-    /// </summary>
-    public int NumberAgents { get; set; }
-    /// <summary>
-    /// Controls the number of documents in the system
-    /// </summary>
-    public int NumberCategories { get; set; }
-    /// <summary>
-    /// Controls how many like users the algorithm identifies to make a recommendation
-    /// </summary>
-    public int LikeAgentNum { get; set; }
-
-    /// <summary>
-    /// The type of metric that is used to filter
-    /// </summary>
-    public Metric metric { get; set; }
-
-    /// <summary>
-    /// Sets the system parameters according to the given arguments.
-    /// </summary>
-    /// <param name="agents">the number of agents in the system</param>
-    /// <param name="docs">the number of documents in the system</param>
-    public Parameters(int agents, int cats)
-    {
-        NumberAgents = agents;
-        NumberCategories = cats;
-        metric = Metric.Cosine;
-    }
-
-}
-
 /// <summary>
 /// Emum for selecting which metric is to be used for calculating the simularity matrix used by the system
 /// </summary>
@@ -58,9 +24,17 @@ public class Recommender : MonoBehaviour
     /// <summary>
     /// The parameters wrapper for the recommender system 
     /// </summary>
-    public Parameters sysp { get; set; }
+    //public Parameters sysp { get; set; }
 
+    /// <summary>
+    /// Controls how many like users the algorithm identifies to make a recommendation
+    /// </summary>
+    public int LikeAgentNum { get; set; }
 
+    /// <summary>
+    /// The type of metric that is used to filter
+    /// </summary>
+    public Metric metric { get; set; }
     public Matrix<double> similarity { get; set; }
 
     /// <summary>
@@ -69,8 +43,8 @@ public class Recommender : MonoBehaviour
     void Awake()
     {
         // Must initialize the parameters before the agents are initialized! 
-        sysp = new Parameters(10, 10);
-        Debug.Log("System parameters set");
+        //sysp = new Parameters(10, 10);
+        //Debug.Log("System parameters set");
     }
 
     private void Start()
@@ -102,13 +76,13 @@ public class Recommender : MonoBehaviour
         GameObject[] agents = GameObject.FindGameObjectsWithTag("Agent");
 
         // Initialize a matrix according to system parameters
-        double[,] matrix = new double[sysp.NumberAgents, sysp.NumberCategories];
+        double[,] matrix = new double[Simulation.instance.agents, Simulation.instance.categories];
 
         // Group the scores from each agent into primitive matrix
         for (int i = 0; i < agents.Length; i++)
         {
             int[] temp = agents[i].GetComponent<Agent>().Scores.ToArray();
-            for (int j = 0; j < sysp.NumberCategories; j++)
+            for (int j = 0; j < Simulation.instance.categories; j++)
             {
                 matrix[i, j] = (double)temp[j];
             }
@@ -121,22 +95,22 @@ public class Recommender : MonoBehaviour
         // Convert the primitive matrix of all of the agents preferences
         Matrix<double> M = DenseMatrix.OfArray(matrix);
         // creates a similarity matrix
-        Matrix<double> simMat = MatBuilder.Dense(sysp.NumberAgents, sysp.NumberAgents);
+        Matrix<double> simMat = MatBuilder.Dense(Simulation.instance.agents, Simulation.instance.agents);
 
-        for (int i = 0; i < sysp.NumberAgents; i++)
+        for (int i = 0; i < Simulation.instance.agents; i++)
         {
-            for (int j = 0; j < sysp.NumberAgents; j++)
+            for (int j = 0; j < Simulation.instance.agents; j++)
             {
 
-                if (sysp.metric == Metric.Cosine)
+                if (metric == Metric.Cosine)
                 {
                     // calculate the cosine similarity of the agents!
                     simMat[i, j] = CosineSimilarity(M.Row(i), M.Row(j));
-                } else if (sysp.metric == Metric.Pearson)
+                } else if (metric == Metric.Pearson)
                 {
                     // calculate the pearson similarity of the agents!
                     simMat[i, j] = PearsonSimilarity(M.Row(i), M.Row(j));
-                } else if (sysp.metric == Metric.Euclidean)
+                } else if (metric == Metric.Euclidean)
                 {
                     // calculate the euclidean similarity of the agents!
                     simMat[i, j] = EuclideanSimilarity(M.Row(i), M.Row(j));

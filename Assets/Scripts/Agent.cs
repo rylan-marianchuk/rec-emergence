@@ -8,12 +8,29 @@ using UnityEngine;
 
 public class Agent : MonoBehaviour
 {
-    /// <summary>
-    /// A reference to the recommender?
-    /// </summary>
-    Recommender r;
+    public State state;
 
-    GameObject rObj;
+    public Document chooseByPolicy()
+    {
+        float sample = Probability.samplefromBeta(state.getAlpha(), state.getBeta());
+
+        // Find the document closest to sample
+        return new Document();
+    }
+
+
+
+    public void learn(Document consumed)
+    {
+
+    }
+
+
+    public void updatePosition()
+    {
+
+    }
+
 
     /// <summary>
     /// Should have some level of interest in categories. I was thinking these should all start around 5 on a scale of 1-10? 
@@ -23,13 +40,14 @@ public class Agent : MonoBehaviour
 
     void Start()
     {
+        /*
         // Creates the system parameters
 
         // GameObject containing the recommender
-        rObj = GameObject.FindGameObjectWithTag("Recommender");
+        //rObj = GameObject.FindGameObjectWithTag("Recommender");
 
         // get the script attached to the recommender object!
-        r = rObj.GetComponent<Recommender>();
+        //r = rObj.GetComponent<Recommender>();
 
         // Generate random set of interests
         // populate the agent's ratings
@@ -50,7 +68,7 @@ public class Agent : MonoBehaviour
         }
         Debug.Log("Agent initialized with preferences: " + log);
 
-
+        */
     }
 
     void Update()
