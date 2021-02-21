@@ -8,18 +8,21 @@ public class Simulation : MonoBehaviour
     public static Simulation instance;
 
     public int agents;
-    public int documents;
     public int documentsPerAgent;
 
     public int categories;
 
-    public List<GameObject> agentList;
+    public List<Agent> agentList;
     public List<Document> documentList;
 
     public float waitTime;
     public long iteration = 0;
 
+    public GameObject agentGo;
+    public GameObject documentGo;
+
     private Recommender recommender;
+    private int counter;
     void Start()
     {
         // Initialize agents & documents
@@ -31,58 +34,103 @@ public class Simulation : MonoBehaviour
         for (int i = 0; i < agents; i++)
         {
             // generate the agents dynamically
-            GameObject agent = new GameObject("Agent " + i);
-            agent.tag = "Agent"; // add the proper tag, so other scripts can reference them. 
-            agent.AddComponent<Agent>(); // add the Agent script to each agent
+            GameObject created = Instantiate(agentGo, Vector3.zero, Quaternion.identity);
+            created.GetComponent<Agent>().state = new State(1, 1);
+            agentList.Add(created.GetComponent<Agent>());
+            // Documents for that agent
+            // Generate all documents by a specified prior distribution
+            for (int j = 0; i < documentsPerAgent; i++)
+            {
+                GameObject doc = Instantiate(documentGo, created.transform);
+                doc.transform.position = created.transform.position + new Vector3(
+                Mathf.Cos(2 * i * Mathf.PI / Simulation.instance.documentsPerAgent),
+                created.transform.position.y,
+                Mathf.Sin(2 * i * Mathf.PI / Simulation.instance.documentsPerAgent)) * 3;
 
-            agentList.Add(agent);
-        }
-
-
-        // Generate all documents by a specified prior distribution
-        for (int i = 0; i < documents; i++)
-        {
-
+                created.GetComponent<Agent>().state.addDocument(doc.GetComponent<Document>());
+            }
         }
     }
 
+    
     void FixedUpdate()
     {
-        foreach (GameObject agent in agentList)
+        if (counter == waitTime)
+        {
+
+            foreach (Agent agent in agentList)
+            {
+                // For each agent, choose a document or choose to post - add to recommender pool - RecSim corpus
+                Document chosen = agent.chooseByPolicy();
+                agent.GetComponent<Agent>().learn(chosen);
+            }
+            Debug.Log("First Wait");
+        }
+        else if (counter == waitTime*2)
+        {
+            foreach (Agent agent in agentList)
+            {
+                // Move agent after consumption Vector3 position
+                agent.updatePosition();
+            }
+
+            Debug.Log("Second Wait, updated position");
+
+        }
+        else if (counter == waitTime * 3)
+        {
+
+            foreach (Agent agent in agentList)
+            {
+                // Recommender replenish with a (all?) new document
+                agent.state.setDocuments(recommender.recommend(agent));
+            }
+
+            Debug.Log("Third Wait, updated documents by recommendation");
+            counter = 0;
+            iteration++;
+        }
+        counter++;
+    }
+    /*
+
+    private IEnumerator ChooseByPolicyCoroutine()
+    {
+        foreach (Agent agent in agentList)
         {
             // For each agent, choose a document or choose to post - add to recommender pool - RecSim corpus
-            Document chosen = agent.GetComponent<Agent>().chooseByPolicy();
+            Document chosen = agent.chooseByPolicy();
+            agent.GetComponent<Agent>().learn(chosen);
         }
 
+        Debug.Log("First Wait");
         // Wait
-        StartCoroutine(WaitCoroutine());
-
-        foreach (GameObject agent in agentList)
-        {
-            // Move agent after consumption Vector3 position
-            agent.GetComponent<Agent>().updatePosition();
-        }
-
-
-        // Wait
-        StartCoroutine(WaitCoroutine());
-
-
-        foreach (GameObject agent in agentList)
-        {
-            // Recommender replenish with a (all?) new document
-        }
-
-
-        // Wait
-        StartCoroutine(WaitCoroutine());
-        
-
-        iteration++;
-    }
-
-    private IEnumerator WaitCoroutine()
-    {
         yield return new WaitForSeconds(waitTime);
     }
+
+    private IEnumerator UpdatePosition()
+    {
+        foreach (Agent agent in agentList)
+        {
+            // Move agent after consumption Vector3 position
+            agent.updatePosition();
+        }
+
+        Debug.Log("Second Wait, updated position");
+        yield return new WaitForSeconds(waitTime);
+    }
+
+    private IEnumerator Recommend()
+    {
+        foreach (Agent agent in agentList)
+        {
+            // Recommender replenish with a (all?) new document
+            agent.state.setDocuments(recommender.recommend(agent));
+        }
+
+        Debug.Log("Third Wait, updated documents by recommendation");
+        // Wait
+        yield return new WaitForSeconds(waitTime);
+    }
+    */
 }

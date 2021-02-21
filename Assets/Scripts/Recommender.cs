@@ -19,7 +19,7 @@ public enum Metric
 }
 
 
-public class Recommender : MonoBehaviour
+public class Recommender
 {
     /// <summary>
     /// The parameters wrapper for the recommender system 
@@ -197,4 +197,9 @@ public class Recommender : MonoBehaviour
         return closestAgents;
     }
 
+
+    public List<Document> recommend(Agent a)
+    {
+        return new List<Document>();
+    }
 }
