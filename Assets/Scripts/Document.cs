@@ -5,4 +5,6 @@ using UnityEngine;
 public class Document : MonoBehaviour
 {
     public float value;
+
+    public Document(float val) { this.value = val; }
 }

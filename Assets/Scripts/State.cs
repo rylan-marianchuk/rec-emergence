@@ -35,7 +35,14 @@ public class State
 
     public void setAlpha(float v) { this.alpha = v; }
     public void setBeta(float v) { this.beta = v; }
-    public void setDocuments(List<Document> v) { documents = new List<Document>(v); }
+    public void setDocuments(List<Document> v) 
+    {
+        this.documents = new List<Document>();
+        foreach (var doc in v)
+        {
+            this.documents.Add(doc);
+        }
+    }
 
     public void addDocument(Document d) { documents.Add(d); }
 }

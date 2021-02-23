@@ -34,19 +34,19 @@ public class Simulation : MonoBehaviour
         for (int i = 0; i < agents; i++)
         {
             // generate the agents dynamically
-            GameObject created = Instantiate(agentGo, Vector3.zero, Quaternion.identity);
+            GameObject created = Instantiate(agentGo, new Vector3(0, 4*i, 0), Quaternion.identity);
             created.GetComponent<Agent>().state = new State(1, 1);
             agentList.Add(created.GetComponent<Agent>());
             // Documents for that agent
             // Generate all documents by a specified prior distribution
-            for (int j = 0; i < documentsPerAgent; i++)
+            for (int j = 0; j < documentsPerAgent; j++)
             {
                 GameObject doc = Instantiate(documentGo, created.transform);
                 doc.transform.position = created.transform.position + new Vector3(
                 Mathf.Cos(2 * i * Mathf.PI / Simulation.instance.documentsPerAgent),
                 created.transform.position.y,
                 Mathf.Sin(2 * i * Mathf.PI / Simulation.instance.documentsPerAgent)) * 3;
-
+                doc.GetComponent<Document>().value = Random.Range(0f, 1f);
                 created.GetComponent<Agent>().state.addDocument(doc.GetComponent<Document>());
             }
         }
@@ -83,7 +83,7 @@ public class Simulation : MonoBehaviour
             foreach (Agent agent in agentList)
             {
                 // Recommender replenish with a (all?) new document
-                agent.state.setDocuments(recommender.recommend(agent));
+                //agent.state.setDocuments(recommender.recommend(agent));
             }
 
             Debug.Log("Third Wait, updated documents by recommendation");

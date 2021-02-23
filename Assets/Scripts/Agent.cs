@@ -44,17 +44,48 @@ public class Agent : MonoBehaviour
     }
 
 
-
+    /**
+     * 
+     * Upon consumption of a document, alpha and beta must update according to some rule.
+     * 
+     * Paradigm: Facilitated polared learning. Learning happens the most given extreme documents.
+     */
     public void learn(Document consumed)
     {
-        state.setAlpha(5);
-        state.setBeta(5);
+        float nextAlpha = sampleGaussian(meanLearningAlpha(consumed.value), 0.2f) + this.state.getAlpha();
+        if (nextAlpha <= 0)
+            state.setAlpha(0.001f);
+        else state.setAlpha(nextAlpha);
+
+
+        float nextBeta = sampleGaussian(meanLearningBeta(consumed.value), 0.2f) + this.state.getBeta();
+        if (nextBeta <= 0)
+            state.setBeta(0.001f);
+        else state.setBeta(nextBeta);
     }
 
 
+    public float meanLearningBeta(float documentRead)
+    {
+        return -0.215f * (documentRead - 0.5f);
+    }
+
+    private float meanLearningAlpha(float documentRead)
+    {
+        // alpha decrease for documents close to zero
+        return 0.215f * (documentRead - 0.5f);
+    }
+
+
+    /**
+     * 
+     * Agents are located in the space according to their alpha and beta instance values.
+     * Alpha and beta are the parameters of the reward distribution for a given belief.
+     * 
+     */
     public void updatePosition()
     {
-        transform.position = new Vector3(state.getBeta() * 10, transform.position.y, state.getAlpha() * 10);
+        transform.position = new Vector3(state.getBeta(), transform.position.y, state.getAlpha());
         // Move bubble and documents with it
 
         for (int i = 0; i < Simulation.instance.documentsPerAgent; i++)
@@ -64,6 +95,25 @@ public class Agent : MonoBehaviour
                 transform.position.y, 
                 Mathf.Sin( 2 * i * Mathf.PI / Simulation.instance.documentsPerAgent))*3;
         }
+    }
+
+
+    /**
+     * 
+     * Pull a single float from the specified Gaussian Distribution which uses Box-Muller transform.
+     * 
+     */
+    private float sampleGaussian(float mean, float sd)
+    {
+        // Two uniform random variables
+        float u1 = Random.Range(0.00001f, 0.99999f);
+        float u2 = Random.Range(0.00001f, 0.99999f);
+
+        // Box-Muller transform
+        float z = Mathf.Sqrt(-2f * Mathf.Log(u1)) * Mathf.Cos(2 * Mathf.PI * u2);
+
+        // Apply paramter scale
+        return z * sd + mean;
     }
 
 

@@ -200,6 +200,11 @@ public class Recommender
 
     public List<Document> recommend(Agent a)
     {
-        return new List<Document>();
+        List<Document> l = new List<Document>();
+        foreach (var document in a.state.getDocuments())
+        {
+            l.Add(new Document(UnityEngine.Random.Range(0f, 1f)));
+        }
+        return l;
     }
 }
