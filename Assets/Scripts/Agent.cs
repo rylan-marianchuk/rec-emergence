@@ -8,7 +8,9 @@ using UnityEngine;
 public class Agent : MonoBehaviour
 {
     public State state;
+    public Vector3 goalPosition;
 
+    public List<float> consumedHistory = new List<float>();
     /**
      * A policy, as defined in the reinforcement learning literature, is a function pi( a  |  s ) that specifies the probability of taking action a if in state s.
      * 
@@ -85,16 +87,8 @@ public class Agent : MonoBehaviour
      */
     public void updatePosition()
     {
-        transform.position = new Vector3(state.getBeta(), transform.position.y, state.getAlpha());
-        // Move bubble and documents with it
-
-        for (int i = 0; i < Simulation.instance.documentsPerAgent; i++)
-        {
-            state.getDocuments()[i].transform.position = transform.position + new Vector3(
-                Mathf.Cos( 2 * i * Mathf.PI / Simulation.instance.documentsPerAgent), 
-                transform.position.y, 
-                Mathf.Sin( 2 * i * Mathf.PI / Simulation.instance.documentsPerAgent))*3;
-        }
+        float newAxisCoord = (state.getAlpha() / (state.getBeta() + state.getAlpha()) - 0.5f) * 50f;
+        this.goalPosition = new Vector3(transform.position.x, transform.position.y, newAxisCoord);
     }
 
 
