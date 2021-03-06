@@ -4,15 +4,7 @@ using UnityEngine;
 
 public class Document : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public float value;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public Document(float val) { this.value = val; }
 }
