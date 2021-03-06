@@ -36,17 +36,23 @@ public class Simulation : MonoBehaviour
             // generate the agents dynamically
             GameObject created = Instantiate(agentGo, new Vector3(0, 4*i, 0), Quaternion.identity);
             created.GetComponent<Agent>().state = new State(1, 1);
+            
             agentList.Add(created.GetComponent<Agent>());
             // Documents for that agent
             // Generate all documents by a specified prior distribution
             for (int j = 0; j < documentsPerAgent; j++)
             {
+                // Instantiate a unity object for each document, in a circle around the agent. 
+                // TODO make these move relative (vertically) to the agent
                 GameObject doc = Instantiate(documentGo, created.transform);
                 doc.transform.position = created.transform.position + new Vector3(
                 Mathf.Cos(2 * i * Mathf.PI / Simulation.instance.documentsPerAgent),
                 created.transform.position.y,
                 Mathf.Sin(2 * i * Mathf.PI / Simulation.instance.documentsPerAgent)) * 3;
-                doc.GetComponent<Document>().value = Random.Range(0f, 1f);
+
+                // Create each document
+                doc.GetComponent<Document>().value = Random.Range(0f, 1f); // assign value to the document
+                // Add the documents to the state of a given agent
                 created.GetComponent<Agent>().state.addDocument(doc.GetComponent<Document>());
             }
         }

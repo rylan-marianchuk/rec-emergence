@@ -21,25 +21,32 @@ public class Agent : MonoBehaviour
     public Document chooseByPolicy()
     {
         var betaDist = new Beta(state.getAlpha(), state.getBeta());
+
+        // generate a sample from the beta distribution specifying the user's beliefs
         float sample = (float)betaDist.Sample();
 
         Debug.Log("SAMPLE CHOSEN: " + sample);
 
-        // Find the document closest to sample
+        // Choose the document available to them closest to the sample
         Document chosen = state.getDocuments()[0];
 
+        // the distance between the sample and the closest matching document
         float mindist = 2f;
+
         for (int i = 0; i < state.getDocuments().Count; i++)
         {
+            // euclidean distance between the sample and the document
             float dist = Mathf.Abs(state.getDocuments()[i].value - sample);
             if (dist < mindist)
             {
+                // update the minimum distance
                 mindist = dist;
+                // update the reference to closest document found so far
                 chosen = state.getDocuments()[i];
             }
         }
 
-        
+        // return the closest match
         return chosen;
     }
 
@@ -49,6 +56,9 @@ public class Agent : MonoBehaviour
      * Upon consumption of a document, alpha and beta must update according to some rule.
      * 
      * Paradigm: Facilitated polared learning. Learning happens the most given extreme documents.
+     * 
+     * This is the so called ``learning'' undergone by each agent upon consuming a document
+     * 
      */
     public void learn(Document consumed)
     {
