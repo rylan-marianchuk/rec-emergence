@@ -2,6 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Helper for state
+/// </summary>
+public class ABPair
+{
+    public float alpha { get; set; }
+    public float beta { get; set; }
+
+    public ABPair (float alpha, float beta)
+    {
+        this.alpha = alpha;
+        this.beta = beta;
+    }
+
+}
 
 /**
  * 
@@ -10,7 +25,12 @@ using UnityEngine;
  */
 public class State
 {
-    private List<Document> documents;
+    /// <summary>
+    /// Represents the alpha and beta values for each category
+    /// </summary>
+    public List<ABPair> categoriesAB { get; set; }
+
+    public List<Document> documents { get; set; }
     private float alpha;
     private float beta;
 
@@ -45,4 +65,7 @@ public class State
     }
 
     public void addDocument(Document d) { documents.Add(d); }
+
+
+
 }
