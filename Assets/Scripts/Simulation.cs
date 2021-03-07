@@ -34,7 +34,7 @@ public class Simulation : MonoBehaviour
     {
         // Initialize agents & documents
         instance = this;
-        recommender = new Recommender();
+        recommender = new Recommender(); // TODO: fix how the recommender is brought into unity
 
         //Parameters p = GameObject.FindGameObjectWithTag("Recommender").GetComponent<Recommender>().sysp;
 

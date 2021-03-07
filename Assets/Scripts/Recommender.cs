@@ -29,12 +29,12 @@ public class Recommender
     /// <summary>
     /// Controls how many like users the algorithm identifies to make a recommendation
     /// </summary>
-    public int LikeAgentNum { get; set; } = 10;
+    public int LikeAgentNum { get; set; } = 3;
 
     /// <summary>
     /// The type of metric that is used to filter
     /// </summary>
-    public Metric metric { get; set; }
+    public Metric metric { get; set; } = Metric.Pearson;
     public Matrix<float> similarity { get; set; }
 
     /// <summary>
@@ -55,6 +55,8 @@ public class Recommender
     // Update is called once per frame
     void Update()
     {
+
+        // Recalculate the matrix
         bool init = false;
         if (!init)
         {
@@ -63,7 +65,7 @@ public class Recommender
             Debug.Log("Similarity matrix: " + similarity.ToString());
         }
 
-        // Recalculate the matrix
+        
         
         
     }
@@ -169,13 +171,13 @@ public class Recommender
         Vector<float> ratings = similarity.Row(agentNum);
 
 
-        List<Tuple<int, double>> res = new List<Tuple<int, double>>();
+        List<Tuple<int, float>> res = new List<Tuple<int, float>>();
 
         for (int i = 0; i < ratings.Count; i++)
         {
             if (i != agentNum)
             {
-                Tuple<int, double> t = new Tuple<int, double>(i, ratings[i]);
+                Tuple<int, float> t = new Tuple<int, float>(i, ratings[i]);
                 res.Add(t);
             }
         }

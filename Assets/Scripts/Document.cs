@@ -29,10 +29,6 @@ public class Document : MonoBehaviour
         values = val;
     }
 
-    public Document()
-    {
-
-    }
 
     /// <summary>
     /// Multiplies the ratings by a scale factor to work with recommender?
