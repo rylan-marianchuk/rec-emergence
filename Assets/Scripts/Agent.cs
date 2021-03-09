@@ -174,7 +174,7 @@ public class Agent : MonoBehaviour
     /// <param name="consumed"></param>
     public void BatchLearn(Document consumed)
     {
-        for (int i = 0; i <Settings.Categories;++i)
+        for (int i = 0; i <Simulation.instance.categories;++i)
         {
             // handle learning for category i
 
