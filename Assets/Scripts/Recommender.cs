@@ -208,28 +208,35 @@ public class Recommender
         List<int> likeAgentNums = FindNearestNeighbours(similarity,LikeAgentNum, a.ID);
 
 
-        Document d = a.GetHistory().First.Value;
 
-        // reference the documents they've recently looked at
-        foreach (var item in likeAgentNums)
+
+        // History metric comparison
+        /*
+         * Concept: compare the recent histories of users, adding the distance between 
+         * to create a calculate history difference metric.
+         * 
+         * Then, the recommender will select at random one of the most recent items it has not yet read?
+         * 
+         */
+
+
+        // Current metric: completely random document-document filtering
+
+        // Choose one of the similar users at random, choose one of their recently consumed documents at random
+        
+        var selectedAgent = likeAgentNums[UnityEngine.Random.Range(0, likeAgentNums.Count)];
+
+        int boundedRandom = UnityEngine.Random.Range(1, 6); // between 1 and 5
+
+        var simAgent = Simulation.instance.agentList[selectedAgent];
+        var d = simAgent.GetHistory().First;
+        int index = 0;
+        while (index < Math.Min(simAgent.GetHistory().Count, boundedRandom))
         {
-            // find the appropriate agent
-            var simAgent = Simulation.instance.agentList[item];
-
-            // look through their history
-
-
-
-            foreach (var doc in simAgent.GetHistory())
-            {
-                // select (update d) somehow
-
-                throw new NotImplementedException();
-            }
-
+            d = d.Next;
         }
 
-        return d;
+        return d.Value; // return the document attached to the node
 
     }
 

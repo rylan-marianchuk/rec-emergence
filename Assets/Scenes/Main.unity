@@ -408,6 +408,7 @@ GameObject:
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
   - component: {fileID: 963194230}
+  - component: {fileID: 963194231}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -513,9 +514,26 @@ MonoBehaviour:
   documentsPerAgent: 11
   categories: 0
   agentList: []
-  documentList: []
   waitTime: 5
   iteration: 0
   agentGo: {fileID: 3338118952071633366, guid: 25465b1effc21b2429d148c6a21a9ca7, type: 3}
   documentGo: {fileID: 5343199679013239110, guid: c8293f400dbe77646a8afc9d8afbcf8e,
     type: 3}
+--- !u!114 &963194231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e441f4f2b1a28e4198216679801dbe9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainSpeed: 100
+  shiftAdd: 250
+  maxShift: 1000
+  camSens: 0.25
+  rotateOnlyIfMousedown: 1
+  movementStaysFlat: 1
