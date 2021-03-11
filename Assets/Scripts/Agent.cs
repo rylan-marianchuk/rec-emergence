@@ -11,7 +11,7 @@ using UnityEngine;
 public class Agent : MonoBehaviour
 {
 
-
+    
     public State state;
 
     public int ID { get; set; }
@@ -174,7 +174,7 @@ public class Agent : MonoBehaviour
     /// <param name="consumed"></param>
     public void BatchLearn(Document consumed)
     {
-        for (int i = 0; i <Simulation.instance.categories;++i)
+        for (int i = 0; i <AdvancedSim.instance.categories;++i)
         {
             // handle learning for category i
 
@@ -219,7 +219,7 @@ public class Agent : MonoBehaviour
         
         // calculate target vector of all categories
 
-        for (int i = 0; i < Settings.Categories; ++i)
+        for (int i = 0; i < AdvancedSim.instance.categories; ++i)
         {
             // get alpha and beta values for each category
             ABPair catAB = state.categoriesAB[i];

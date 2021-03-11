@@ -43,8 +43,11 @@ public class State
 
     public State(float _alpha, float _beta)
     {
-        this.alpha = _alpha;
-        this.beta = _beta;
+        categoriesAB = new List<ABPair>();
+        for (int i = 0; i < AdvancedSim.instance.categories; i++)
+        {
+            categoriesAB.Add(new ABPair(alpha, beta));
+        }
         this.documents = new List<Document>();
     }
 

@@ -146,23 +146,16 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 314655394}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9d21d23f000bba4b91d91f2cfbe3039, type: 3}
+  m_Script: {fileID: 11500000, guid: f70b13fe27075624f9521fd2cfd16418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agents: 0
-  documentsPerAgent: 0
-  categories: 0
-  agentList: []
-  documentList: []
-  waitTime: 0
-  iteration: 0
-  iterationCap: 200
-  agentGo: {fileID: 0}
-  room: {fileID: 0}
-  documentGo: {fileID: 0}
-  shouldWriteResults: 0
+  cameraSensitivity: 90
+  climbSpeed: 4
+  normalMoveSpeed: 10
+  slowMoveFactor: 0.25
+  fastMoveFactor: 3
 --- !u!81 &314655396
 AudioListener:
   m_ObjectHideFlags: 0
@@ -258,16 +251,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agents: 3
-  documentsPerAgent: 0
+  documentsPerAgent: 5
   categories: 6
   agentList: []
   documentList: []
-  waitTime: 0
+  waitTime: 8
   iteration: 0
   iterationCap: 200
   agentGo: {fileID: 3338118952071633366, guid: 25465b1effc21b2429d148c6a21a9ca7, type: 3}
   room: {fileID: 3515882589721121689, guid: ef018a2aa3191284682c753c0bad9edd, type: 3}
   documentGo: {fileID: 5343199679013239110, guid: c8293f400dbe77646a8afc9d8afbcf8e,
+    type: 3}
+  agentController: {fileID: 5484365549632841037, guid: a6eb4b68116e1414aafc8874f8e87849,
     type: 3}
   shouldWriteResults: 0
 --- !u!4 &1294433596
