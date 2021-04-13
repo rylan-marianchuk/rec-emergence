@@ -89,7 +89,7 @@ public class Simulation : MonoBehaviour
             foreach (Agent agent in agentList)
             {
                 // For each agent, choose a document or choose to post - add to recommender pool - RecSim corpus
-                Document chosen = agent.chooseByPolicy();
+                Document chosen = agent.chooseByPolicy(true);
                 documentHistory[i][iteration] = chosen.value;
                 agent.GetComponent<Agent>().learn(chosen);
                 i++;

@@ -3,21 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class FileWrite
+public class FileWrite : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
     /**
      * 
      * Write all data for each agent as end results of simulation
@@ -27,9 +14,12 @@ public class FileWrite
      */
     public static void WriteSummary(List<float[]> documentHistory, List<float[]> finalState)
     {
-        StreamWriter documentHistoryTXT = new StreamWriter("document-history.txt");
-        StreamWriter finalStateTXT = new StreamWriter("final-state.txt");
-        
+        //StreamWriter documentHistoryTXT = new StreamWriter(Application.dataPath + "document-history.txt");
+        //StreamWriter finalStateTXT = new StreamWriter(Application.dataPath + "final-state.txt");
+
+
+
+        /*
         for (int i = 0; i < documentHistory.Count; i++)
         {
             string line1 = string.Join(",", documentHistory[i]);
@@ -38,10 +28,20 @@ public class FileWrite
             finalStateTXT.WriteLine(line2);
         }
         documentHistoryTXT.Flush();
-        documentHistoryTXT.Close();
         finalStateTXT.Flush();
-        finalStateTXT.Close();
+        */
 
-        Debug.Log("Wrote to file successfully.");
+        string documentHistoryTXT = "";
+        string finalStateTXT = "";
+
+        for (int i = 0; i < documentHistory.Count; i++)
+        {
+            documentHistoryTXT += string.Join(",", documentHistory[i]) + "\n";
+            finalStateTXT += string.Join(",", finalState[i]) + "\n";
+        }
+
+        System.IO.File.WriteAllText(Application.dataPath + "/document-history.txt", documentHistoryTXT);
+        System.IO.File.WriteAllText(Application.dataPath + "/final-state.txt", finalStateTXT);
+        Debug.Log("Wrote to files successfully.");
     }
 }

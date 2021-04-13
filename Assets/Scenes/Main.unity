@@ -285,8 +285,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 1.9721532e-31, y: 9.403955e-38, z: 2.3509887e-38,
-    w: 0}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 4e-45}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -510,12 +509,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a68adfbe2ef31374c95d331c3ad0a21a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agents: 20
-  documentsPerAgent: 7
+  agents: 200
+  documentsPerAgent: 8
   categories: 0
   agentList: []
   documentList: []
-  waitTime: 1
+  waitTime: 4
   iteration: 0
   iterationCap: 200
   agentGo: {fileID: 3338118952071633366, guid: 25465b1effc21b2429d148c6a21a9ca7, type: 3}

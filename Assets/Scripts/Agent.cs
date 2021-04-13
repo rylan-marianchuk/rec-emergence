@@ -19,8 +19,10 @@ public class Agent : MonoBehaviour
      *      2. use this sample and compare its value with all other document values.
      *      3. Choose the document that is closest to the sample. (Choosing a document IS the action.)
      *   return that chosen document
+     *   
+     *   bool diversity: 
      */
-    public Document chooseByPolicy()
+    public Document chooseByPolicy(bool diversity)
     {
         var betaDist = new Beta(state.getAlpha(), state.getBeta());
         float sample = (float)betaDist.Sample();
@@ -31,12 +33,18 @@ public class Agent : MonoBehaviour
         Document chosen = state.getDocuments()[0];
 
         float mindist = 2f;
+        float maxdist = -2f;
         for (int i = 0; i < state.getDocuments().Count; i++)
         {
             float dist = Mathf.Abs(state.getDocuments()[i].value - sample);
-            if (dist < mindist)
+            if (dist < mindist && !diversity)
             {
                 mindist = dist;
+                chosen = state.getDocuments()[i];
+            }
+            else if (dist > maxdist && diversity)
+            {
+                maxdist = dist;
                 chosen = state.getDocuments()[i];
             }
         }
@@ -44,7 +52,6 @@ public class Agent : MonoBehaviour
         
         return chosen;
     }
-
 
     /**
      * 
