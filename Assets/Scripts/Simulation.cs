@@ -110,7 +110,7 @@ public class Simulation : MonoBehaviour
             foreach (Agent agent in agentList)
             {
                 // Move agent after consumption Vector3 position
-                agent.updatePosition();
+                //agent.updatePosition();
             }
 
             Debug.Log("Second Wait, updated position");

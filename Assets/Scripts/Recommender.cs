@@ -26,10 +26,6 @@ public class Recommender
     /// </summary>
     //public Parameters sysp { get; set; }
 
-    /// <summary>
-    /// Controls how many like users the algorithm identifies to make a recommendation
-    /// </summary>
-    public int LikeAgentNum { get; set; } = 3;
 
     /// <summary>
     /// The type of metric that is used to filter
@@ -37,37 +33,9 @@ public class Recommender
     public Metric metric { get; set; } = Metric.Pearson;
     public Matrix<float> similarity { get; set; }
 
-    /// <summary>
-    /// Instantiation of objects that other scripts/objects rely on
-    /// </summary>
-    void Awake()
-    {
-        // Must initialize the parameters before the agents are initialized! 
-        //sysp = new Parameters(10, 10);
-        //Debug.Log("System parameters set");
-    }
-
-    private void Start()
+    public Recommender()
     {
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-        // Recalculate the matrix
-        bool init = false;
-        if (!init)
-        {
-            similarity = calculateSimilarityMatrix();
-            init = true;
-            Debug.Log("Similarity matrix: " + similarity.ToString());
-        }
-
-        
-        
-        
     }
 
     public Matrix<float> calculateSimilarityMatrix()
@@ -75,44 +43,35 @@ public class Recommender
         //Calculate the matrix!
 
         // Gather all of the agents in the scene
-        List<Agent> aList = Simulation.instance.agentList;
+        List<Agent> aList = GraphSimulation.Instance.Agents;
 
-
-        List<Vector<float>> agentData = new List<Vector<float>>();
-
-        // Group the scores from each agent into primitive matrix
-        for (int i = 0; i < aList.Count; i++)
-        {
-            agentData.Add(aList[i].GetHistoryAvgVec());
-        }
 
         // Some initialization for Math.NET / matrix algebra
         var MatBuilder = Matrix<float>.Build;
-        var VecBuilder = Vector<float>.Build;
+        //var VecBuilder = Vector<float>.Build;
 
-        // Convert the primitive matrix of all of the agents preferences
-        Matrix<float> M = MatBuilder.DenseOfRows(agentData);
 
-        // creates a similarity matrix
-        Matrix<float> simMat = MatBuilder.Dense(Simulation.instance.agents, Simulation.instance.agents);
 
-        for (int i = 0; i < Simulation.instance.agents; i++)
+        Matrix<float> simMat = MatBuilder.Dense(Settings.NumberAgents, Settings.NumberAgents, 0.0f);
+
+        for (int i = 0; i < Settings.NumberAgents; i++)
         {
-            for (int j = 0; j < Simulation.instance.agents; j++)
+            Vector<float> AgentI = aList[i].GetHistoryAvgVec();
+            for (int j = 0; j < Settings.NumberAgents; j++)
             {
-
+                Vector<float> AgentJ = aList[j].GetHistoryAvgVec();
                 if (metric == Metric.Cosine)
                 {
                     // calculate the cosine similarity of the agents!
-                    simMat[i, j] = CosineSimilarity(M.Row(i), M.Row(j));
+                    simMat[i, j] = CosineSimilarity(AgentI, AgentJ);
                 } else if (metric == Metric.Pearson)
                 {
                     // calculate the pearson similarity of the agents!
-                    simMat[i, j] = PearsonSimilarity(M.Row(i), M.Row(j));
+                    simMat[i, j] = PearsonSimilarity(AgentI, AgentJ);
                 } else if (metric == Metric.Euclidean)
                 {
                     // calculate the euclidean similarity of the agents!
-                    simMat[i, j] = EuclideanSimilarity(M.Row(i), M.Row(j));
+                    simMat[i, j] = EuclideanSimilarity(AgentI, AgentJ);
                 }
 
             }
@@ -205,7 +164,7 @@ public class Recommender
     public Document targetedRecommend(Agent a)
     {
         // find the 3 most similar agent numbers
-        List<int> likeAgentNums = FindNearestNeighbours(similarity,LikeAgentNum, a.ID);
+        List<int> likeAgentNums = FindNearestNeighbours(similarity,Settings.NumberSimilarAgents, a.ID);
 
 
 

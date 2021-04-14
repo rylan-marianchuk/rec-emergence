@@ -106,25 +106,6 @@ public class Agent : MonoBehaviour
     }
 
 
-    /**
-     * 
-     * Agents are located in the space according to their alpha and beta instance values.
-     * Alpha and beta are the parameters of the reward distribution for a given belief.
-     * 
-     */
-    public void updatePosition()
-    {
-        transform.position = new Vector3(state.getBeta(), transform.position.y, state.getAlpha());
-        // Move bubble and documents with it
-
-        for (int i = 0; i < Simulation.instance.documentsPerAgent; i++)
-        {
-            state.getDocuments()[i].transform.position = transform.position + new Vector3(
-                Mathf.Cos( 2 * i * Mathf.PI / Simulation.instance.documentsPerAgent), 
-                transform.position.y, 
-                Mathf.Sin( 2 * i * Mathf.PI / Simulation.instance.documentsPerAgent))*3;
-        }
-    }
 
 
     /**
@@ -174,7 +155,7 @@ public class Agent : MonoBehaviour
     /// <param name="consumed"></param>
     public void BatchLearn(Document consumed)
     {
-        for (int i = 0; i <AdvancedSim.instance.categories;++i)
+        for (int i = 0; i <Settings.Categories;++i)
         {
             // handle learning for category i
 
@@ -219,7 +200,7 @@ public class Agent : MonoBehaviour
         
         // calculate target vector of all categories
 
-        for (int i = 0; i < AdvancedSim.instance.categories; ++i)
+        for (int i = 0; i < Settings.Categories; ++i)
         {
             // get alpha and beta values for each category
             ABPair catAB = state.categoriesAB[i];
@@ -278,16 +259,23 @@ public class Agent : MonoBehaviour
     {
         var VectorBuilder = Vector<float>.Build;
 
-
-        var combined = VectorBuilder.Dense(_history.First.Value.values.Count);
-
-        foreach (var d in _history)
+        if (_history.Count > 0)
         {
-            combined += VectorBuilder.DenseOfArray(d.values.ToArray());
+
+            var combined = VectorBuilder.Dense(_history.First.Value.values.Count);
+
+            foreach (var d in _history)
+            {
+                combined += VectorBuilder.DenseOfArray(d.values.ToArray());
+            }
+
+            // divide combined by count
+            return (combined / _history.Count);
+        } else
+        {
+            return VectorBuilder.Dense(Settings.Categories, 0.0f);
         }
 
-        // divide combined by count
-        return (combined / _history.Count) * 5;
 
     }
 
@@ -298,37 +286,21 @@ public class Agent : MonoBehaviour
 
     #endregion
 
-    void Start()
+    void Awake()
     {
-        /*
-        // Creates the system parameters
 
-        // GameObject containing the recommender
-        //rObj = GameObject.FindGameObjectWithTag("Recommender");
-
-        // get the script attached to the recommender object!
-        //r = rObj.GetComponent<Recommender>();
-
-        // Generate random set of interests
-        // populate the agent's ratings
-        // generates random values from 0-10 for now
-        // @TODO: change for later!
-        Scores = new List<int>();
-
-        for (int i = 0; i < r.sysp.NumberCategories; i++)
+        state = new State(1, 1);
+        for (int j = 0; j < Settings.DocumentsPerAgent; j++)
         {
-            Scores.Add(Random.Range(0, 10));
+            List<float> vals = new List<float>();
+            for (int k = 0; k < Settings.Categories; ++k)
+            {
+                vals.Add(Random.Range(0f, 1f));
+            }
+            Document d = new Document(vals);
+            state.documents.Add(d);
         }
 
-        
-        string log = "";
-        foreach (var item in Scores)
-        {
-            log+=item.ToString() + " ";
-        }
-        Debug.Log("Agent initialized with preferences: " + log);
-
-        */
     }
 
     /// <summary>

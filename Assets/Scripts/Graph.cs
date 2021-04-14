@@ -22,8 +22,8 @@ public class Edge
 
 public class Graph : MonoBehaviour
 {
-    private float EDGE_THRESHOLD = 0.7f;
-    [SerializeField] private Sprite circleSprite;
+    public float EDGE_THRESHOLD = 0.9f;
+
     private RectTransform graphContainer;
 
     private List<GameObject> verts = new List<GameObject>();
@@ -34,24 +34,25 @@ public class Graph : MonoBehaviour
     {
         graphContainer = transform.Find("graphContainer").GetComponent<RectTransform>();
 
-        float r = 0.4;
+        List<Vector2> LocalVerts = new List<Vector2>();
+
+        float r = 0.4f;
         for (int i = 0; i < Settings.NumberAgents; i++)
         {
             float theta = Mathf.Deg2Rad * i * 360.0f / Settings.NumberAgents;
-            Vector2 pos = new Vector2(r * Mathf.cos(theta), r * Mathf.Sin(theta));
-            verts.Add(CreateCircle(pos)); // Add the 
-
-
+            Vector2 pos = new Vector2(0.5f + r * Mathf.Cos(theta), 0.5f + r * Mathf.Sin(theta));
+            LocalVerts.Add(pos);
         }
-        // Draw all the edges
+        ShowGraph(LocalVerts);
+
     }
 
 
     private GameObject CreateCircle(Vector2 anchoredPosition)
     {
         GameObject gameObject = new GameObject("circle", typeof(Image));
+        gameObject.GetComponent<Image>().color = new Color(0, 0, 0, 1.0f);
         gameObject.transform.SetParent(graphContainer, false);
-        gameObject.GetComponent<Image>().sprite = circleSprite;
         RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
         rectTransform.anchoredPosition = anchoredPosition;
         rectTransform.sizeDelta = new Vector2(11, 11);
@@ -80,7 +81,7 @@ public class Graph : MonoBehaviour
 
     }
 
-    private void ShowGraph(List<Vector2> vertices, List<Edge> edges)
+    private void ShowGraph(List<Vector2> vertices)
     {
         float graphHeight = graphContainer.sizeDelta.y;
         float graphWidth = graphContainer.sizeDelta.x;
@@ -90,16 +91,16 @@ public class Graph : MonoBehaviour
         {
             float xPos = (vertices[i].x / xMax) * graphWidth;                            
             float yPos = (vertices[i].y / yMax) * graphHeight;
-            CreateCircle(new Vector2(xPos, yPos)); // make sure to return GameObject so edges can be drawn
+            verts.Add(CreateCircle(new Vector2(xPos, yPos))); // make sure to return GameObject so edges can be drawn
         }
 
 
     }
-    private void CreateEdge(Vector2 dotA, Vector2 dotB)
+    private GameObject CreateEdge(Vector2 dotA, Vector2 dotB, float opacity)
     {
         GameObject gameObject = new GameObject("edge", typeof(Image));
         gameObject.transform.SetParent(graphContainer, false);
-        gameObject.GetComponent<Image>().color = new Color(1, 1, 1, 0.5f); // make the bars slightly transparent
+        gameObject.GetComponent<Image>().color = new Color(0.584f, 0, 0.639f, Mathf.Max(0.00f,opacity * 0.5f)); // make the bars slightly transparent
         RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
         Vector2 dir = (dotB - dotA).normalized;
         float distance = Vector2.Distance(dotA,dotB);
@@ -108,24 +109,35 @@ public class Graph : MonoBehaviour
         rectTransform.sizeDelta = new Vector2(distance, 3f);
         rectTransform.anchoredPosition = dotA + dir * distance  * 0.5f;
         rectTransform.localEulerAngles = new Vector3(0, 0, GetAngleFromVectorFloat(dir));
+        return gameObject;
     }
 
+    public void DrawEdge(Edge e)
+    {
+        GameObject v1 = verts[e.Start];
+        GameObject v2 = verts[e.End];
 
+        Vector2 pos1 = v1.GetComponent<RectTransform>().anchoredPosition;
+        Vector2 pos2 = v2.GetComponent<RectTransform>().anchoredPosition;
 
-    private void GenerateSimilarityGraph()
+        edges.Add(CreateEdge(pos1, pos2, e.Value));
+
+    }
+
+    private void DrawSimilarityGraph()
     {
 
-        Matrix<float> similarity = GraphSimulation.Instance.recommender.similarity;
+        Matrix<float> similarity = GraphSimulation.Instance.recommender.calculateSimilarityMatrix();
 
         if (similarity == null)
         {
             Debug.Log("Similarity matrix is null.");
             return;
         }
-
+        Debug.Log(similarity);
         // create graph representation of similarity matrix
         List<Vector2> vertices = new List<Vector2>();
-        List<Edge> graph = new List<Edge>();
+        List<Edge> localEdges = new List<Edge>();
 
         // Gather edges from similarity matrix
         for (int i = 0; i < similarity.RowCount; i++)
@@ -137,22 +149,35 @@ public class Graph : MonoBehaviour
                 {
                     // We want agents who are similar to have less distance
                     // so invert the similarity to get distance
-                    graph.Add(new Edge(i, j, sim));
+                    localEdges.Add(new Edge(i, j, sim));
                 }
 
             }
         }
 
 
+        ClearEdges();
+        foreach (Edge e in localEdges)
+        {
+            DrawEdge(e);
+        }
 
     }
 
+    
+    public void ClearEdges()
+    {
+        foreach (var item in edges)
+        {
+            GameObject.Destroy(item);
+        }
+    }
 
     // Update is called once per frame
     void Update()
     {
-      
-        //GenerateDirectedGraph(Recommender.Instance.similarity);
+
+        DrawSimilarityGraph();
 
     }
 
