@@ -44,7 +44,7 @@ public class State
     public State(float _alpha, float _beta)
     {
         categoriesAB = new List<ABPair>();
-        for (int i = 0; i < AdvancedSim.instance.categories; i++)
+        for (int i = 0; i < Settings.Categories; i++)
         {
             categoriesAB.Add(new ABPair(alpha, beta));
         }
