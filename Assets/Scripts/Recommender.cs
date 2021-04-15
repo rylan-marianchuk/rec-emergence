@@ -76,7 +76,7 @@ public class Recommender
 
             }
         }
-
+        similarity = simMat;
         return simMat;
     }
 
@@ -125,7 +125,10 @@ public class Recommender
     /// <returns></returns>
     public static List<int> FindNearestNeighbours(Matrix<float> similarity, int neighbours, int agentNum)
     {
-
+        if (similarity == null)
+        {
+            return new List<int>();
+        }
         // take the matrix row, and find the k closest values
         Vector<float> ratings = similarity.Row(agentNum);
 
@@ -187,12 +190,13 @@ public class Recommender
 
         int boundedRandom = UnityEngine.Random.Range(1, 6); // between 1 and 5
 
-        var simAgent = Simulation.instance.agentList[selectedAgent];
+        var simAgent = GraphSimulation.Instance.Agents[selectedAgent];
         var d = simAgent.GetHistory().First;
         int index = 0;
-        while (index < Math.Min(simAgent.GetHistory().Count, boundedRandom))
+        while (index < Math.Min(simAgent.GetHistory().Count - 1, boundedRandom))
         {
             d = d.Next;
+            index++;
         }
 
         return d.Value; // return the document attached to the node

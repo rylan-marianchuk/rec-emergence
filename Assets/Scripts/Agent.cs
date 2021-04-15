@@ -241,6 +241,9 @@ public class Agent : MonoBehaviour
             }
 
         }
+
+        state.documents.Remove(chosen);
+
         return chosen;
     }
 

@@ -16,14 +16,14 @@ public static class Settings
 
     // Overall simulation settings
 
-    public static int Categories { get; set; } = 5;
+    public static int Categories { get; set; } = 10;
 
     public static int NumberAgents { get; set; } = 10;
 
-    public static int DocumentsPerAgent { get; set; } = 6;
+    public static int DocumentsPerAgent { get; set; } = 20;
 
     // Recommender system settings
-    public static int NumberSimilarAgents { get; set; } = 3;
+    public static int NumberSimilarAgents { get; set; } = 5;
 
 
 

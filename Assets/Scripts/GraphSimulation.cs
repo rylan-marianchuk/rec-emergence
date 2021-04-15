@@ -39,17 +39,25 @@ public class GraphSimulation : Singleton<GraphSimulation>
 
     void FixedUpdate()
     {
-        foreach (Agent agent in Agents)
-        {
-            Debug.Log(agent.state.documents.Count);
-            // For each agent, choose a document or choose to consume from the list of 
-            // documents recommended to them (random at start)
-            Document chosen = agent.BatchChooseByPolicy();
-            // add it to the user's history
-            agent.AddToHistory(chosen);
-            // tweak learning stats of agent
-            agent.GetComponent<Agent>().BatchLearn(chosen);
-        }
+
+            foreach (Agent agent in Agents)
+            {
+
+                // For each agent, choose a document or choose to consume from the list of 
+                // documents recommended to them (random at start)
+                Document chosen = agent.BatchChooseByPolicy();
+
+                if (recommender.similarity != null)
+                    agent.state.addDocument(recommender.targetedRecommend(agent));
+
+                // add it to the user's history
+                agent.AddToHistory(chosen);
+                // tweak learning stats of agent
+
+                agent.BatchLearn(chosen);
+
+            }
+
 
         //recommender.similarity = recommender.calculateSimilarityMatrix();
         //Debug.Log(recommender.similarity);
