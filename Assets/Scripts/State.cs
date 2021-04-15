@@ -14,27 +14,29 @@ public class State
     private float alpha;
     private float beta;
 
-    public State(float _alpha, float _beta, List<Document> _documents)
-    {
-        this.alpha = _alpha;
-        this.beta = _beta;
-        this.documents = new List<Document>(_documents);
-    }
+    // Extending to the 2 dimensional case
+    private float alpha1;
+    private float beta1;
 
-    public State(float _alpha, float _beta)
+    public State()
     {
-        this.alpha = _alpha;
-        this.beta = _beta;
-        this.documents = new List<Document>();
+        this.alpha = 1;
+        this.alpha1 = 1;
+        this.beta = 1;
+        this.beta1 = 1;
+        documents = new List<Document>();
     }
-
 
     public float getAlpha() { return alpha; }
     public float getBeta() { return beta; }
+    public float getAlpha1() { return alpha1; }
+    public float getBeta1() { return beta1; }
     public List<Document> getDocuments() { return this.documents; }
 
     public void setAlpha(float v) { this.alpha = v; }
     public void setBeta(float v) { this.beta = v; }
+    public void setAlpha1(float v) { this.alpha1 = v; }
+    public void setBeta1(float v) { this.beta1 = v; }
     public void setDocuments(List<Document> v) 
     {
         this.documents = new List<Document>();

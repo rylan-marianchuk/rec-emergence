@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using MathNet.Numerics.Distributions;
+using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics;
 using UnityEngine;
 
 
@@ -9,8 +11,10 @@ public class Agent : MonoBehaviour
 {
     public State state;
     public Vector3 goalPosition;
+    private LinkedList<Document> _history = new LinkedList<Document>();
 
     public List<float> consumedHistory = new List<float>();
+    public int HistorySize { get; set; } = 20;
     /**
      * A policy, as defined in the reinforcement learning literature, is a function pi( a  |  s ) that specifies the probability of taking action a if in state s.
      * 
@@ -25,9 +29,11 @@ public class Agent : MonoBehaviour
     public Document chooseByPolicy(bool diversity)
     {
         var betaDist = new Beta(state.getAlpha(), state.getBeta());
+        var betaDist1 = new Beta(state.getAlpha(), state.getBeta());
         float sample = (float)betaDist.Sample();
+        float sample1 = (float)betaDist1.Sample();
 
-        Debug.Log("SAMPLE CHOSEN: " + sample);
+        //Debug.Log("SAMPLE CHOSEN: " + sample);
 
         // Find the document closest to sample
         Document chosen = state.getDocuments()[0];
@@ -36,7 +42,7 @@ public class Agent : MonoBehaviour
         float maxdist = -2f;
         for (int i = 0; i < state.getDocuments().Count; i++)
         {
-            float dist = Mathf.Abs(state.getDocuments()[i].value - sample);
+            float dist = Mathf.Sqrt((state.getDocuments()[i].value - sample) * (state.getDocuments()[i].value - sample) + (state.getDocuments()[i].value1 - sample1) * (state.getDocuments()[i].value1 - sample1));
             if (dist < mindist && !diversity)
             {
                 mindist = dist;
@@ -71,6 +77,17 @@ public class Agent : MonoBehaviour
         if (nextBeta <= 0)
             state.setBeta(0.001f);
         else state.setBeta(nextBeta);
+
+        float nextAlpha1 = sampleGaussian(meanLearningAlpha(consumed.value1), 0.2f) + this.state.getAlpha1();
+        if (nextAlpha1 <= 0)
+            state.setAlpha1(0.001f);
+        else state.setAlpha1(nextAlpha1);
+
+
+        float nextBeta1 = sampleGaussian(meanLearningBeta(consumed.value1), 0.2f) + this.state.getBeta1();
+        if (nextBeta1 <= 0)
+            state.setBeta1(0.001f);
+        else state.setBeta1(nextBeta1);
     }
 
 
@@ -94,8 +111,9 @@ public class Agent : MonoBehaviour
      */
     public void updatePosition()
     {
-        float newAxisCoord = (state.getAlpha() / (state.getBeta() + state.getAlpha()) - 0.5f) * 50f;
-        this.goalPosition = new Vector3(transform.position.x, transform.position.y, newAxisCoord);
+        float newAxisCoordx = (state.getAlpha() / (state.getBeta() + state.getAlpha()) - 0.5f) * 100f;
+        float newAxisCoordz = (state.getBeta1() / (state.getBeta1() + state.getAlpha1()) - 0.5f) * 100f;
+        this.goalPosition = new Vector3(newAxisCoordx, transform.position.y, newAxisCoordz);
     }
 
 
@@ -118,43 +136,21 @@ public class Agent : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// Should have some level of interest in categories. I was thinking these should all start around 5 on a scale of 1-10? 
-    /// This way, the agents will have at least some bearing without starting them off with an already extreme profile.
-    /// </summary>
-    public List<int> Scores { get; set; }
 
-    void Start()
+    public LinkedList<Document> GetHistory()
     {
-        /*
-        // Creates the system parameters
+        return _history;
+    }
 
-        // GameObject containing the recommender
-        //rObj = GameObject.FindGameObjectWithTag("Recommender");
+    public void AddToHistory(Document d)
+    {
+        _history.AddFirst(d);
 
-        // get the script attached to the recommender object!
-        //r = rObj.GetComponent<Recommender>();
-
-        // Generate random set of interests
-        // populate the agent's ratings
-        // generates random values from 0-10 for now
-        // @TODO: change for later!
-        Scores = new List<int>();
-
-        for (int i = 0; i < r.sysp.NumberCategories; i++)
+        if (_history.Count == HistorySize + 1)
         {
-            Scores.Add(Random.Range(0, 10));
+            _history.RemoveLast();
         }
 
-        
-        string log = "";
-        foreach (var item in Scores)
-        {
-            log+=item.ToString() + " ";
-        }
-        Debug.Log("Agent initialized with preferences: " + log);
-
-        */
     }
 
 }

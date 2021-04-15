@@ -29,13 +29,13 @@ public class Recommender
     /// <summary>
     /// Controls how many like users the algorithm identifies to make a recommendation
     /// </summary>
-    public int LikeAgentNum { get; set; }
+    public int LikeAgentNum { get; set; } = 3;
 
     /// <summary>
     /// The type of metric that is used to filter
     /// </summary>
-    public Metric metric { get; set; }
-    public Matrix<double> similarity { get; set; }
+    public Metric metric { get; set; } = Metric.Pearson;
+    public Matrix<float> similarity { get; set; }
 
     /// <summary>
     /// Instantiation of objects that other scripts/objects rely on
@@ -52,50 +52,34 @@ public class Recommender
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        bool init = false;
-        if (!init)
-        {
-            similarity = calculateSimilarityMatrix();
-            init = true;
-            Debug.Log("Similarity matrix: " + similarity.ToString());
-        }
 
-        // Recalculate the matrix
-        
-        
-    }
-
-    public Matrix<double> calculateSimilarityMatrix()
+    public Matrix<float> calculateSimilarityMatrix()
     {
         //Calculate the matrix!
 
         // Gather all of the agents in the scene
-        GameObject[] agents = GameObject.FindGameObjectsWithTag("Agent");
+        List<Agent> aList = Simulation.instance.agentList;
 
-        // Initialize a matrix according to system parameters
-        double[,] matrix = new double[Simulation.instance.agents, Simulation.instance.categories];
+
+        List<Vector<float>> agentData = new List<Vector<float>>();
 
         // Group the scores from each agent into primitive matrix
-        for (int i = 0; i < agents.Length; i++)
+        /*
+        for (int i = 0; i < aList.Count; i++)
         {
-            int[] temp = agents[i].GetComponent<Agent>().Scores.ToArray();
-            for (int j = 0; j < Simulation.instance.categories; j++)
-            {
-                matrix[i, j] = (double)temp[j];
-            }
+            agentData.Add(aList[i].GetHistoryAvgVec());
         }
+        */
 
         // Some initialization for Math.NET / matrix algebra
-        var MatBuilder = Matrix<double>.Build;
-        var VecBuilder = Vector<double>.Build;
+        var MatBuilder = Matrix<float>.Build;
+        var VecBuilder = Vector<float>.Build;
 
         // Convert the primitive matrix of all of the agents preferences
-        Matrix<double> M = DenseMatrix.OfArray(matrix);
+        Matrix<float> M = MatBuilder.DenseOfRows(agentData);
+
         // creates a similarity matrix
-        Matrix<double> simMat = MatBuilder.Dense(Simulation.instance.agents, Simulation.instance.agents);
+        Matrix<float> simMat = MatBuilder.Dense(Simulation.instance.agents, Simulation.instance.agents);
 
         for (int i = 0; i < Simulation.instance.agents; i++)
         {
@@ -106,11 +90,13 @@ public class Recommender
                 {
                     // calculate the cosine similarity of the agents!
                     simMat[i, j] = CosineSimilarity(M.Row(i), M.Row(j));
-                } else if (metric == Metric.Pearson)
+                }
+                else if (metric == Metric.Pearson)
                 {
                     // calculate the pearson similarity of the agents!
                     simMat[i, j] = PearsonSimilarity(M.Row(i), M.Row(j));
-                } else if (metric == Metric.Euclidean)
+                }
+                else if (metric == Metric.Euclidean)
                 {
                     // calculate the euclidean similarity of the agents!
                     simMat[i, j] = EuclideanSimilarity(M.Row(i), M.Row(j));
@@ -130,10 +116,10 @@ public class Recommender
     /// <param name="a">The first vector</param>
     /// <param name="b">The second vector</param>
     /// <returns></returns>
-    public static double CosineSimilarity(Vector<double> a, Vector<double> b)
+    public static float CosineSimilarity(Vector<float> a, Vector<float> b)
     {
-        double dot = a.DotProduct(b);
-        double denom = a.L2Norm() * b.L2Norm();
+        float dot = a.DotProduct(b);
+        float denom = ((float)a.L2Norm()) * ((float)b.L2Norm());
 
         return dot / denom;
     }
@@ -144,17 +130,17 @@ public class Recommender
     /// <param name="a">The first vector</param>
     /// <param name="b">The second vector</param>
     /// <returns></returns>
-    public static double PearsonSimilarity(Vector<double> a, Vector<double> b)
+    public static float PearsonSimilarity(Vector<float> a, Vector<float> b)
     {
-        double covariance = Statistics.Covariance(a, b);
-        double denom = Statistics.StandardDeviation(a) * Statistics.StandardDeviation(b);
+        float covariance = (float)Statistics.Covariance(a, b);
+        float denom = ((float)Statistics.StandardDeviation(a)) * ((float)Statistics.StandardDeviation(b));
 
         return covariance / denom;
     }
 
-    public static double EuclideanSimilarity(Vector<double> a, Vector<double> b)
+    public static float EuclideanSimilarity(Vector<float> a, Vector<float> b)
     {
-        double dist = Distance.Euclidean<double>(a, b);
+        float dist = (float)Distance.Euclidean(a, b);
         return 1 / (1 + dist);
     }
 
@@ -165,20 +151,20 @@ public class Recommender
     /// <param name="neighbours">The number of desired similar neighbours</param>
     /// <param name="agentNum"> The agent number to find similar agents to</param>
     /// <returns></returns>
-    public static List<int> FindNearestNeighbours(Matrix<double> similarity, int neighbours, int agentNum)
+    public static List<int> FindNearestNeighbours(Matrix<float> similarity, int neighbours, int agentNum)
     {
 
         // take the matrix row, and find the k closest values
-        Vector<double> ratings = similarity.Row(agentNum);
+        Vector<float> ratings = similarity.Row(agentNum);
 
 
-        List<Tuple<int, double>> res = new List<Tuple<int, double>>();
+        List<Tuple<int, float>> res = new List<Tuple<int, float>>();
 
         for (int i = 0; i < ratings.Count; i++)
         {
             if (i != agentNum)
             {
-                Tuple<int, double> t = new Tuple<int, double>(i, ratings[i]);
+                Tuple<int, float> t = new Tuple<int, float>(i, ratings[i]);
                 res.Add(t);
             }
         }
@@ -198,12 +184,13 @@ public class Recommender
     }
 
 
+    
     public List<Document> recommend(Agent a)
     {
         List<Document> l = new List<Document>();
         foreach (var document in a.state.getDocuments())
         {
-            l.Add(new Document(UnityEngine.Random.Range(0f, 1f)));
+            l.Add(new Document(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f)));
         }
         return l;
     }

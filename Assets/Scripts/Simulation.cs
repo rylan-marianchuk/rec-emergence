@@ -44,8 +44,8 @@ public class Simulation : MonoBehaviour
         for (int i = 0; i < agents; i++)
         {
             // generate the agents dynamically
-            GameObject created = Instantiate(agentGo, new Vector3(-100 + 6.5f*i, 1.5f, 0), Quaternion.identity);
-            created.GetComponent<Agent>().state = new State(1, 1);
+            GameObject created = Instantiate(agentGo, new Vector3(0, 0, 0), Quaternion.identity);
+            created.GetComponent<Agent>().state = new State();
             agentList.Add(created.GetComponent<Agent>());
 
             documentHistory.Add(new float[iterationCap]);
@@ -89,8 +89,9 @@ public class Simulation : MonoBehaviour
             foreach (Agent agent in agentList)
             {
                 // For each agent, choose a document or choose to post - add to recommender pool - RecSim corpus
-                Document chosen = agent.chooseByPolicy(true);
+                Document chosen = agent.chooseByPolicy(false);
                 documentHistory[i][iteration] = chosen.value;
+                agent.AddToHistory(chosen);
                 agent.GetComponent<Agent>().learn(chosen);
                 i++;
             }
