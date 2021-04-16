@@ -21,13 +21,12 @@ May be cloned and run with Unity 2019.2.5f1 for guaranteed stability.
 (Branch 'rylan', scene main)
 
 **Parameters and the UI**
+
 n :  number of agents
 
 d :  number of documents per agent 
 
 T :  time cap, an integer
-
-r : max number of other agents used for CF
 
 'D' or 'F' : agent policy, (D)iversity or (F)amiliarity
 
