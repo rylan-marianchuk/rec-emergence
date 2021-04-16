@@ -113,7 +113,7 @@ public class Agent : MonoBehaviour
     {
         float newAxisCoordx = (state.getAlpha() / (state.getBeta() + state.getAlpha()) - 0.5f) * 100f;
         float newAxisCoordz = (state.getBeta1() / (state.getBeta1() + state.getAlpha1()) - 0.5f) * 100f;
-        this.goalPosition = new Vector3(newAxisCoordx, transform.position.y, newAxisCoordz);
+        this.goalPosition = new Vector3(transform.position.x, transform.position.y, newAxisCoordx);
     }
 
 

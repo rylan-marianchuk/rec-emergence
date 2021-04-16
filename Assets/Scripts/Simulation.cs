@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class Simulation : MonoBehaviour
 {
@@ -17,7 +19,7 @@ public class Simulation : MonoBehaviour
 
     public float waitTime;
     public long iteration = 0;
-    public long iterationCap = 200;
+    public long iterationCap;
 
     public GameObject agentGo;
     public GameObject documentGo;
@@ -30,8 +32,61 @@ public class Simulation : MonoBehaviour
     private List<float[]> documentHistory;
     private List<float[]> agentEndState;
 
-    void Start()
+    private bool canStart = false;
+
+    /// <summary>
+    /// UI SECTION
+    /// </summary>
+    
+    /// <summary>
+    /// Number of agents.
+    /// </summary>
+    public Slider n;
+
+    /// <summary>
+    /// Documents per agent
+    /// </summary>
+    public Slider d;
+
+    /// <summary>
+    /// Time Cap
+    /// </summary>
+    public Slider T;
+
+
+    /// <summary>
+    /// Number of agents any given agents uses for its recommendation
+    /// </summary>
+    public int r;
+
+
+    /// <summary>
+    /// Recommender similarity metric: ('E') Euclidean Distance, ('P') Pearson
+    /// </summary>
+    public char R;
+
+    /// <summary>
+    /// Policy : ('F') Seeking Familiarity, ('D') Seeking Diversity
+    /// </summary>
+    public InputField P;
+
+
+
+    public void Restart()
     {
+        if (agentList != null)
+        {
+            // Destory them all and recreate them
+            foreach (var item in agentList)
+            {
+                Destroy(item.gameObject);
+            }
+        }
+        iteration = 0;
+        this.documentsPerAgent = (int)d.value;
+        this.agents = (int)n.value;
+        this.iterationCap = (int)T.value;
+
         // Initialize agents & documents
         instance = this;
         recommender = new Recommender();
@@ -44,7 +99,7 @@ public class Simulation : MonoBehaviour
         for (int i = 0; i < agents; i++)
         {
             // generate the agents dynamically
-            GameObject created = Instantiate(agentGo, new Vector3(0, 0, 0), Quaternion.identity);
+            GameObject created = Instantiate(agentGo, new Vector3(-100 + 6.5f*i, 1.5f, 0), Quaternion.identity);
             created.GetComponent<Agent>().state = new State();
             agentList.Add(created.GetComponent<Agent>());
 
@@ -64,11 +119,13 @@ public class Simulation : MonoBehaviour
                 created.GetComponent<Agent>().state.addDocument(doc.GetComponent<Document>());
             }
         }
+        canStart = true;
     }
 
 
     void FixedUpdate()
     {
+        if (!canStart) return;
         if (iteration == iterationCap)
         {
             if (!writtenResults && shouldWriteResults)
@@ -89,7 +146,7 @@ public class Simulation : MonoBehaviour
             foreach (Agent agent in agentList)
             {
                 // For each agent, choose a document or choose to post - add to recommender pool - RecSim corpus
-                Document chosen = agent.chooseByPolicy(false);
+                Document chosen = agent.chooseByPolicy(P.text.Equals("D"));
                 documentHistory[i][iteration] = chosen.value;
                 agent.AddToHistory(chosen);
                 agent.GetComponent<Agent>().learn(chosen);
@@ -130,45 +187,4 @@ public class Simulation : MonoBehaviour
             agent.transform.position = Vector3.Lerp(agent.transform.position, agent.GetComponent<Agent>().goalPosition, Time.deltaTime*0.05f);
         }
     }
-    /*
-
-    private IEnumerator ChooseByPolicyCoroutine()
-    {
-        foreach (Agent agent in agentList)
-        {
-            // For each agent, choose a document or choose to post - add to recommender pool - RecSim corpus
-            Document chosen = agent.chooseByPolicy();
-            agent.GetComponent<Agent>().learn(chosen);
-        }
-
-        Debug.Log("First Wait");
-        // Wait
-        yield return new WaitForSeconds(waitTime);
-    }
-
-    private IEnumerator UpdatePosition()
-    {
-        foreach (Agent agent in agentList)
-        {
-            // Move agent after consumption Vector3 position
-            agent.updatePosition();
-        }
-
-        Debug.Log("Second Wait, updated position");
-        yield return new WaitForSeconds(waitTime);
-    }
-
-    private IEnumerator Recommend()
-    {
-        foreach (Agent agent in agentList)
-        {
-            // Recommender replenish with a (all?) new document
-            agent.state.setDocuments(recommender.recommend(agent));
-        }
-
-        Debug.Log("Third Wait, updated documents by recommendation");
-        // Wait
-        yield return new WaitForSeconds(waitTime);
-    }
-    */
 }
