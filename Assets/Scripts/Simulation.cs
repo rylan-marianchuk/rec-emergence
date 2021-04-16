@@ -76,7 +76,6 @@ public class Simulation : MonoBehaviour
     {
         if (agentList != null)
         {
-            // Destory them all and recreate them
             foreach (var item in agentList)
             {
                 Destroy(item.gameObject);
@@ -93,7 +92,7 @@ public class Simulation : MonoBehaviour
 
         documentHistory = new List<float[]>();
         agentEndState = new List<float[]>();
-
+        agentList.Clear();
         //Parameters p = GameObject.FindGameObjectWithTag("Recommender").GetComponent<Recommender>().sysp;
 
         for (int i = 0; i < agents; i++)
