@@ -17,7 +17,6 @@ public class GraphSimulation : Singleton<GraphSimulation>
     void Awake()
     {
 
-
         for (int i = 0; i < Settings.NumberAgents; i++)
         {
             // create the agent objects that correspond to models

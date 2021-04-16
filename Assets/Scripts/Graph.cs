@@ -30,8 +30,16 @@ public class Graph : MonoBehaviour
 
     private List<GameObject> edges = new List<GameObject>();
 
+    private List<Color> colors = new List<Color>();
+
     private void Start()
     {
+
+        for (int i =0; i < 10000; i++)
+        {
+            colors.Add(new Color(Random.value, Random.value, Random.value));
+        }
+
         graphContainer = transform.Find("graphContainer").GetComponent<RectTransform>();
 
         List<Vector2> LocalVerts = new List<Vector2>();
@@ -96,11 +104,11 @@ public class Graph : MonoBehaviour
 
 
     }
-    private GameObject CreateEdge(Vector2 dotA, Vector2 dotB, float opacity)
+    private GameObject CreateEdge(Vector2 dotA, Vector2 dotB, Color c)
     {
         GameObject gameObject = new GameObject("edge", typeof(Image));
         gameObject.transform.SetParent(graphContainer, false);
-        gameObject.GetComponent<Image>().color = new Color(0.584f, 0, 0.639f, Mathf.Max(0.00f,opacity * 0.5f)); // make the bars slightly transparent
+        gameObject.GetComponent<Image>().color = c; // make the bars slightly transparent
         RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
         Vector2 dir = (dotB - dotA).normalized;
         float distance = Vector2.Distance(dotA,dotB);
@@ -112,7 +120,7 @@ public class Graph : MonoBehaviour
         return gameObject;
     }
 
-    public void DrawEdge(Edge e)
+    public void DrawEdge(Edge e, Color c)
     {
         GameObject v1 = verts[e.Start];
         GameObject v2 = verts[e.End];
@@ -120,7 +128,7 @@ public class Graph : MonoBehaviour
         Vector2 pos1 = v1.GetComponent<RectTransform>().anchoredPosition;
         Vector2 pos2 = v2.GetComponent<RectTransform>().anchoredPosition;
 
-        edges.Add(CreateEdge(pos1, pos2, e.Value));
+        edges.Add(CreateEdge(pos1, pos2, c));
 
     }
 
@@ -139,6 +147,14 @@ public class Graph : MonoBehaviour
         List<Vector2> vertices = new List<Vector2>();
         List<Edge> localEdges = new List<Edge>();
 
+        List<List<int>> adjacency = new List<List<int>>();
+
+
+        for (int i = 0; i < similarity.RowCount; i++)
+        {
+            adjacency.Add(new List<int>());
+        }
+
         // Gather edges from similarity matrix
         for (int i = 0; i < similarity.RowCount; i++)
         {
@@ -150,16 +166,30 @@ public class Graph : MonoBehaviour
                     // We want agents who are similar to have less distance
                     // so invert the similarity to get distance
                     localEdges.Add(new Edge(i, j, sim));
+                    adjacency[i].Add(j);
                 }
 
             }
         }
 
 
+        List<List<int>> clusters = FindClusters(adjacency);
+
+
         ClearEdges();
         foreach (Edge e in localEdges)
         {
-            DrawEdge(e);
+            Color col = new Color(0,0,0);
+            for (int i = 0; i < clusters.Count; i++)
+            {
+                
+                if (clusters[i].Contains(e.Start))
+                {
+                    Debug.Log(i);
+                    col = colors[i];
+                }
+            }
+            DrawEdge(e, col);
         }
 
     }
@@ -189,5 +219,58 @@ public class Graph : MonoBehaviour
 
         return n;
     }
+
+
+    public static List<List<int>> FindClusters(List<List<int>> adj)
+    {
+        // Returns a list of edges in a cycle (cycles identify clusters) 
+
+        List<List<int>> output = new List<List<int>>();
+
+        List<bool> visited = new List<bool>();
+
+        for (int i = 0; i < adj.Count; i++)
+            visited.Add(false);
+
+        for (int i = 0; i < adj.Count; i++)
+        {
+            List<int> cluster = BreadthFirstSearch(adj, i, visited);
+            if (cluster.Count > 2)
+                output.Add(cluster);
+        }
+
+        
+
+        return output;
+
+
+    }
+
+    static List<int> BreadthFirstSearch(List<List<int>> adj, int v, List<bool> visited)
+    {
+        List<int> chain = new List<int>();
+        Queue<int> queue = new Queue<int>();
+
+        visited[v] = true;
+
+        queue.Enqueue(v);
+
+        while (!(queue.Count == 0))
+        {
+            v = queue.Dequeue();
+            chain.Add(v);
+            foreach (var neighbour in adj[v])
+            {
+                if (!visited[neighbour])
+                {
+                    visited[neighbour] = true;
+                    queue.Enqueue(neighbour);
+                }
+            }
+
+        }
+        return chain;
+    }
+
 
 }
