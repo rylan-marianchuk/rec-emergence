@@ -11,7 +11,8 @@ Here we look to model belief based multi-agent interaction within recommendation
 Agents hold belief distributions (parameterized by two floats), act by choosing a document in its environment, recieve feedback, and continue this interplay through time with other agents: 
 ![MDP](mdp.png)
 
-An agent surrounded by documents to consume, akin to online social media environments:
+An agent surrounded by documents to consume, akin to online social media environments. Interaction between agents occurs through the recommendation system as a proxy.
+
 ![Agent](AgentSide.PNG)
 
 May be cloned and run with Unity 2019.2.5f1 for guaranteed stability.
@@ -20,6 +21,17 @@ May be cloned and run with Unity 2019.2.5f1 for guaranteed stability.
 (Branch 'rylan', scene main)
 
 **Parameters and the UI**
+n :  number of agents
+
+d :  number of documents per agent 
+
+T :  time cap, an integer
+
+r : max number of other agents used for CF
+
+'D' or 'F' : agent policy, (D)iversity or (F)amiliarity
+
+Must press restart to see changed parameters realized. This begins a new simulation. Positions in the space reflect agent belief distribution.
 
 ![UI](ui.PNG)
 
