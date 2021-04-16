@@ -4,9 +4,7 @@ using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics;
 using UnityEngine;
-
-
-
+using System.Linq;
 
 public class Agent : MonoBehaviour
 {
@@ -17,6 +15,8 @@ public class Agent : MonoBehaviour
     public int ID { get; set; }
     public int HistorySize { get; set; } = 20;
     private LinkedList<Document> _history = new LinkedList<Document>();
+
+
 
     #region deprecated (replaced by multi-dim learning system)
 
@@ -220,7 +220,9 @@ public class Agent : MonoBehaviour
 
         Document chosen = state.documents[0];
 
-        float minDist = 2f;
+        float minDist = 10000f;
+
+        float maxDist = 0f;
 
         for (int i = 0; i < state.documents.Count; ++i)
         {
@@ -231,6 +233,17 @@ public class Agent : MonoBehaviour
             var distance = (float) Distance.Euclidean(target,docVec);
 
             // take euclidean distance between
+
+            if (distance < minDist && !Settings.diversity)
+            {
+                minDist = distance;
+                chosen = state.getDocuments()[i];
+            }
+            else if (distance > maxDist && Settings.diversity)
+            {
+                maxDist = distance;
+                chosen = state.getDocuments()[i];
+            }
 
             if (distance < minDist)
             {
@@ -291,16 +304,24 @@ public class Agent : MonoBehaviour
 
     void Awake()
     {
-
+        // Create an initial set of documents for the agent at random
         state = new State(1, 1);
         for (int j = 0; j < Settings.DocumentsPerAgent; j++)
         {
             List<float> vals = new List<float>();
             for (int k = 0; k < Settings.Categories; ++k)
             {
-                vals.Add(Random.Range(0f, 1f));
+                if (k < Settings.NumberCategoriesSelected)
+                {
+                    vals.Add(1);
+                } else
+                {
+                    vals.Add(0);
+                }
             }
-            Document d = new Document(vals);
+            
+            float[] shuffled = vals.OrderBy(x => Random.Range(0, 10000)).ToArray();
+            Document d = new Document(new List<float>(shuffled));
             state.documents.Add(d);
         }
 
@@ -309,9 +330,55 @@ public class Agent : MonoBehaviour
     /// <summary>
     /// For the future: agents will be able to add documents to the system
     /// </summary>
-    public void MakeDocument()
+    public Document MakeDocument()
     {
-        throw new System.NotImplementedException();
+
+        // choose sample some subset of the categories that the agent is most interested in 
+        // since history is derived on interest, this will be based off of their history
+
+        List<Document> hist = _history.ToList<Document>();
+
+        int[] likedCategories = new int[Settings.Categories];
+
+        foreach (var item in hist)
+        {
+            for(int i = 0; i < item.values.Count;i++)
+            {
+                if (item.values[i] == 1)
+                {
+                    likedCategories[i]++;
+                }
+            }
+        }
+
+
+        List<int> interested = new List<int>();
+        // Now that we have an idea of the most liked categories
+        // find indexes they've liked
+        for (int i = 0; i < Settings.Categories; i++)
+        {
+            if (likedCategories[i] > 0)
+            {
+                interested.Add(i);
+            }
+        }
+
+
+        int[] shuffled = interested.OrderBy(x => Random.Range(0, 10000)).ToArray();
+        float[] vals = new float[Settings.Categories];
+        for (int i = 0; i < Settings.NumberCategoriesSelected; i++)
+        {
+            vals[shuffled[i]] = 1;
+        }
+
+
+        // pick NumberCategoriesSelected of them to keep
+        // generate new bitvector of documents
+
+        return new Document(new List<float>(vals));
+
+
+
     }
 
 }

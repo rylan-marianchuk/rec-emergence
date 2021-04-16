@@ -22,7 +22,7 @@ public class Edge
 
 public class Graph : MonoBehaviour
 {
-    public float EDGE_THRESHOLD = 0.9f;
+    public float EDGE_THRESHOLD = 0.95f;
 
     private RectTransform graphContainer;
 
@@ -142,7 +142,7 @@ public class Graph : MonoBehaviour
             Debug.Log("Similarity matrix is null.");
             return;
         }
-        Debug.Log(similarity);
+
         // create graph representation of similarity matrix
         List<Vector2> vertices = new List<Vector2>();
         List<Edge> localEdges = new List<Edge>();
@@ -185,7 +185,6 @@ public class Graph : MonoBehaviour
                 
                 if (clusters[i].Contains(e.Start))
                 {
-                    Debug.Log(i);
                     col = colors[i];
                 }
             }
@@ -221,6 +220,11 @@ public class Graph : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Driver code for BFS to find clusters from an adjacency list
+    /// </summary>
+    /// <param name="adj">the graphs adjacency list</param>
+    /// <returns></returns>
     public static List<List<int>> FindClusters(List<List<int>> adj)
     {
         // Returns a list of edges in a cycle (cycles identify clusters) 
@@ -246,6 +250,13 @@ public class Graph : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Used to identify a cluster within a graph
+    /// </summary>
+    /// <param name="adj">the adjacency list of a graph</param>
+    /// <param name="v">the root vertices</param>
+    /// <param name="visited">the list of visited nodes</param>
+    /// <returns></returns>
     static List<int> BreadthFirstSearch(List<List<int>> adj, int v, List<bool> visited)
     {
         List<int> chain = new List<int>();

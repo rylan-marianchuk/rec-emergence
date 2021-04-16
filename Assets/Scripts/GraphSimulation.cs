@@ -51,15 +51,20 @@ public class GraphSimulation : Singleton<GraphSimulation>
 
                 // add it to the user's history
                 agent.AddToHistory(chosen);
-                // tweak learning stats of agent
 
-                agent.BatchLearn(chosen);
+            // tweak learning stats of agent
 
+            agent.BatchLearn(chosen);
+
+
+            if (Random.value < Settings.Engagement)
+            {
+                agent.AddToHistory(agent.MakeDocument());
             }
 
 
-        //recommender.similarity = recommender.calculateSimilarityMatrix();
-        //Debug.Log(recommender.similarity);
+        }
+
     }
 
 }

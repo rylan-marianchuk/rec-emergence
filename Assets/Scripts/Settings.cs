@@ -16,17 +16,22 @@ public static class Settings
 
     // Overall simulation settings
 
-    public static int Categories { get; set; } = 10;
+    public static int Categories { get; set; } = 50;
 
-    public static int NumberAgents { get; set; } = 10;
+    public static int NumberAgents { get; set; } = 25;
 
-    public static int DocumentsPerAgent { get; set; } = 20;
+    public static int DocumentsPerAgent { get; set; } = 30;
 
     // Recommender system settings
     public static int NumberSimilarAgents { get; set; } = 5;
 
+    public static bool diversity { get; set; } = false;
 
+    // the number of active categories each document has
+    public static int NumberCategoriesSelected { get; set; } = 2;
 
+    public static float Engagement { get; set; } = 0.3f;
 
 }
+
 
