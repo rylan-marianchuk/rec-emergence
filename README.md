@@ -21,7 +21,7 @@ May be cloned and run with Unity 2019.2.5f1 for guaranteed stability.
 
 **Parameters and the UI**
 
-![UI](ui.png)
+![UI](ui.PNG)
 
 
 
