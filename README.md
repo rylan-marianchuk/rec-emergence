@@ -53,6 +53,7 @@ Parameters are labelled on the UI. Here's a brief explanation of what each one i
 
 Must press restart to see changed parameters realized. This begins a new simulation. The edges of the graph correlate to the similarity of the agents, with  clusters of similar agents being drawn differently. 
 
+The UI for graph visualizer is a bit broken, but I just couldn't trace where the errors came from :( Please edit the settings in the Settings class instead. 
 
 
 
