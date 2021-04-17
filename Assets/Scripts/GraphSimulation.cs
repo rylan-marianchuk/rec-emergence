@@ -23,7 +23,7 @@ public class GraphSimulation : Singleton<GraphSimulation>
             GameObject gameObject = new GameObject("Agent " + i);
             gameObject.AddComponent<Agent>(); 
             Agent a = gameObject.GetComponent<Agent>();
-
+            a.ID = i;
 
             Agents.Add(a);
 
