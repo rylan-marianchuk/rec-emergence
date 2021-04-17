@@ -37,4 +37,22 @@ Must press restart to see changed parameters realized. This begins a new simulat
 
 
 ## (2) Multidimensional Information Environments
-(Branch 'main', scene xxx)
+(Branch 'dylan-latest', scene GraphScene)
+
+![A preview of this branch.](https://imgur.com/sOs8HMa)
+
+Parameters are labelled on the UI. Here's a brief explanation of what each one is: 
+
+- Categories: The number of categories realized by the system
+- Number of Agents: The number of agents that there will be in a given instance of the simulation
+- Documents per agent: how many documents an agent will have in a simulation
+- Number of similar agents: the number of agents the recommender will pick from when choosing similar agents to make a recommendation
+- Similarity dropdown: select a desired scheme for agents to follow
+- Number of categories selected: This is the number of categories each document is capped to
+- Engagement: the frequency at which agents produce new documents
+
+Must press restart to see changed parameters realized. This begins a new simulation. The edges of the graph correlate to the similarity of the agents, with  clusters of similar agents being drawn differently. 
+
+
+
+
