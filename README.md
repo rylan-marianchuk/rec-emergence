@@ -39,7 +39,7 @@ Must press restart to see changed parameters realized. This begins a new simulat
 ## (2) Multidimensional Information Environments
 (Branch 'dylan-latest', scene GraphScene)
 
-![A preview of this branch.](https://imgur.com/sOs8HMa)
+![A preview of this branch.](https://i.imgur.com/sOs8HMa.gif)
 
 Parameters are labelled on the UI. Here's a brief explanation of what each one is: 
 
