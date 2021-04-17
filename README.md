@@ -9,7 +9,7 @@ Here we look to model belief based multi-agent interaction within recommendation
 
 
 Agents hold belief distributions (parameterized by two floats), act by choosing a document in its environment, recieve feedback, and continue this interplay through time with other agents: 
-![MDP](mdp.png)
+![MDP](mdp.PNG)
 
 An agent surrounded by documents to consume, akin to online social media environments. Interaction between agents occurs through the recommendation system as a proxy.
 
