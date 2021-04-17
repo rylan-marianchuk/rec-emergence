@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 /// <summary>
 /// Containts frequently used system parameters for easy universal access
 /// </summary>
-public static class Settings
+public static class Settings 
 {
     // at some point when things r stable we should transfer all customizable parameter
     // references to this

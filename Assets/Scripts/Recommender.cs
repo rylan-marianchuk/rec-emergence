@@ -166,6 +166,12 @@ public class Recommender
     /// <returns></returns>
     public Document targetedRecommend(Agent a)
     {
+
+        if (similarity == null)
+        {
+            return a.MakeDocument();
+        }
+
         // find the 3 most similar agent numbers
         List<int> likeAgentNums = FindNearestNeighbours(similarity,Settings.NumberSimilarAgents, a.ID);
 
