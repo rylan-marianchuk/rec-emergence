@@ -32,6 +32,8 @@ public static class Settings
 
     public static float Engagement { get; set; } = 0.3f;
 
+    public static Metric metric { get; set; } = Metric.Pearson;
+
 }
 
 

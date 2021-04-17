@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GraphSimulation : Singleton<GraphSimulation>
 {
@@ -13,6 +14,66 @@ public class GraphSimulation : Singleton<GraphSimulation>
 
     public float waitTime;
     private int counter;
+
+
+    private bool canStart = false;
+
+    public Slider Categories;
+
+    public Slider NumberAgents;
+
+    public Slider DocumentsPerAgent;
+
+    public Slider NumberSimilarAgents;
+
+    public Slider NumberCategoriesSelected;
+
+    public Slider Engagement;
+
+    public Dropdown SimilarityMetric;
+
+    public Dropdown Policy;
+
+
+    public void Restart()
+    {
+        if (Agents != null)
+        {
+            foreach (var item in Agents)
+            {
+                Destroy(item.gameObject);
+            }
+        }
+
+        Settings.Categories = (int)Categories.value;
+        Settings.NumberAgents = (int)NumberAgents.value;
+        Settings.DocumentsPerAgent = (int)DocumentsPerAgent.value;
+        Settings.NumberSimilarAgents = (int)NumberSimilarAgents.value;
+
+
+        Policy.options.Add(new Dropdown.OptionData("Diversity"));
+        Policy.options.Add(new Dropdown.OptionData("Familiarity"));
+
+
+        SimilarityMetric.options.Add(new Dropdown.OptionData("Pearson"));
+        SimilarityMetric.options.Add(new Dropdown.OptionData("Euclidean"));
+        SimilarityMetric.options.Add(new Dropdown.OptionData("Cosine"));
+
+        Settings.Engagement = Engagement.normalizedValue;
+
+        for (int i = 0; i < Settings.NumberAgents; i++)
+        {
+            // create the agent objects that correspond to models
+            GameObject gameObject = new GameObject("Agent " + i);
+            gameObject.AddComponent<Agent>();
+            Agent a = gameObject.GetComponent<Agent>();
+            a.ID = i;
+
+            Agents.Add(a);
+
+
+        }
+    }
 
     void Awake()
     {
@@ -29,9 +90,9 @@ public class GraphSimulation : Singleton<GraphSimulation>
 
             
         }
+
         // Initialize agents & documents
         recommender = new Recommender();
-
 
     }
 
